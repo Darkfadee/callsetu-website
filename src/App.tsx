@@ -64,14 +64,6 @@ const storySteps = [
   ['04', 'The business action happens', 'Appointment booked, lead scored, callback created, WhatsApp sent, CRM updated, and manager alerted when needed.'],
 ]
 
-const trace = [
-  ['00:00', 'Dial Tata Nexon lead from Bangalore Q2 sheet', 'PSTN'],
-  ['00:04', 'Customer answers in Kannada-Hinglish mix', 'ASR'],
-  ['00:13', 'Asha confirms model, showroom, and weekend slot', 'AGENT'],
-  ['00:31', 'Exchange-bonus objection handled from approved policy', 'GUARDRAIL'],
-  ['00:48', 'Qualified · Sat 4:30 PM · CRM + SMS synced', 'SYNC'],
-]
-
 const capabilities = [
   { icon: PhoneCall, title: 'Dialer-scale outbound', copy: 'Launch thousands of warm calls from a sheet while retry logic, DND, and calling windows stay controlled.' },
   { icon: Languages, title: 'Indian voice realism', copy: 'Switch between English, Hindi, Hinglish, Kannada, Tamil, Telugu, Marathi, and brand-trained scripts.' },
@@ -95,16 +87,409 @@ const proofStats = [
   ['CRM-ready', 'summary + recording + disposition', 'structured notes arrive where your team already works'],
 ]
 
-const languages = ['English', 'Hindi', 'Hinglish', 'Kannada', 'Tamil', 'Telugu']
+const languages: LanguageMode[] = ['English', 'Hindi', 'Hinglish', 'Kannada', 'Tamil', 'Telugu']
 
-const cockpitLeads = [
-  ['Rohan P.', 'Hinglish', 'Test drive', 'Calling now'],
-  ['Ananya S.', 'English', 'Exchange offer', 'Interested'],
-  ['Vivek K.', 'Hindi', 'Callback', 'Sat 11 AM'],
-  ['Mehul R.', 'Kannada', 'Not reachable', 'Retry 6 PM'],
-]
+type LanguageMode = 'English' | 'Hindi' | 'Hinglish' | 'Kannada' | 'Tamil' | 'Telugu'
+type OperatorMode = 'Pause campaign' | 'Edit script' | 'Review low-confidence' | 'Escalate hot lead' | 'Export report'
 
-const operatorControls = ['Pause campaign', 'Edit script', 'Review low-confidence', 'Escalate hot lead', 'Export report']
+const languageLabels: Record<LanguageMode, string> = {
+  English: 'English',
+  Hindi: 'हिन्दी',
+  Hinglish: 'Hinglish',
+  Kannada: 'ಕನ್ನಡ',
+  Tamil: 'தமிழ்',
+  Telugu: 'తెలుగు',
+}
+
+const pageCopy: Record<LanguageMode, {
+  nav: string[]
+  navCta: string
+  heroEyebrow: string
+  heroTitleA: string
+  heroTitleB: string
+  heroValue: string
+  heroText: string
+  heroPrimary: string
+  heroSecondary: string
+  heroProof: string[]
+  proofEyebrow: string
+  proofTitle: string
+  proofText: string
+  labEyebrow: string
+  labTitle: string
+  labText: string
+  latency: string
+  safetyOn: string
+  nowSpeaking: string
+  productEyebrow: string
+  productTitle: string
+  productText: string
+  callQueue: string
+  liveTranscript: string
+  nextAction: string
+  approve: string
+  usecaseTitle: string
+  safetyTitle: string
+  pricingTitle: string
+}> = {
+  English: {
+    nav: ['Voice lab', 'Story', 'Product', 'Use cases', 'Safety'],
+    navCta: 'Book test call',
+    heroEyebrow: 'Cinematic voice AI command center',
+    heroTitleA: 'Every call becomes',
+    heroTitleB: 'a moving story.',
+    heroValue: 'AI voice agents that answer, qualify, book, and sync every customer call.',
+    heroText: 'CallSetu turns lead lists into warm, multilingual conversations — then shows the journey from first ring to booked outcome with live transcripts, policy rails, CRM syncs, and human handoffs.',
+    heroPrimary: 'Try a live AI call',
+    heroSecondary: 'Watch the flow',
+    heroProof: ['Hindi + Hinglish + regional language modes', 'First test calls after one playbook setup', 'Human handoff when the AI should stop'],
+    proofEyebrow: 'Operational proof',
+    proofTitle: 'Built for high-volume customer calls in India.',
+    proofText: 'Not a chatbot skin — a calling system with response windows, outcomes, recordings, handoffs, and CRM-ready proof.',
+    labEyebrow: 'Interactive voice lab',
+    labTitle: 'Tap a voice. Watch the interface breathe.',
+    labText: 'Tabs, live states, hover depth, animated waveforms, and realistic policy prompts make the product feel alive instead of static.',
+    latency: 'Latency 480ms',
+    safetyOn: 'Voice safety on',
+    nowSpeaking: 'Now speaking',
+    productEyebrow: 'Product cockpit',
+    productTitle: 'From lead list to live calls in under an hour.',
+    productText: 'The cockpit is now part dashboard, part animated evidence: queue, transcript, policy, outcome, and action rails in one cinematic surface.',
+    callQueue: 'Call queue',
+    liveTranscript: 'Live transcript',
+    nextAction: 'Next action',
+    approve: 'Approve + sync',
+    usecaseTitle: 'Every repeatable phone playbook gets its own agent.',
+    safetyTitle: 'Human warmth. Machine-level control.',
+    pricingTitle: 'Your next customer is already calling. Let CallSetu answer.',
+  },
+  Hindi: {
+    nav: ['वॉइस लैब', 'कहानी', 'प्रोडक्ट', 'यूज़ केस', 'सुरक्षा'],
+    navCta: 'टेस्ट कॉल बुक करें',
+    heroEyebrow: 'सिनेमैटिक वॉइस AI कमांड सेंटर',
+    heroTitleA: 'हर कॉल बनती है',
+    heroTitleB: 'चलती हुई कहानी।',
+    heroValue: 'AI वॉइस एजेंट जो हर ग्राहक कॉल का जवाब, क्वालिफाई, बुक और सिंक करते हैं।',
+    heroText: 'CallSetu लीड लिस्ट को गर्म, बहुभाषी बातचीत में बदलता है — फिर पहली रिंग से बुकिंग तक का सफ़र लाइव ट्रांसक्रिप्ट, पॉलिसी रेल, CRM सिंक और ह्यूमन हैंडऑफ के साथ दिखाता है।',
+    heroPrimary: 'लाइव AI कॉल आज़माएँ',
+    heroSecondary: 'फ्लो देखें',
+    heroProof: ['Hindi + Hinglish + क्षेत्रीय भाषा मोड', 'एक प्लेबुक सेटअप के बाद टेस्ट कॉल', 'जब AI रुकना चाहिए तब ह्यूमन हैंडऑफ'],
+    proofEyebrow: 'ऑपरेशनल प्रूफ',
+    proofTitle: 'भारत की हाई-वॉल्यूम ग्राहक कॉल्स के लिए बना।',
+    proofText: 'यह चैटबॉट स्किन नहीं — response windows, outcomes, recordings, handoffs और CRM-ready proof वाला calling system है।',
+    labEyebrow: 'इंटरैक्टिव वॉइस लैब',
+    labTitle: 'एक आवाज़ चुनें। इंटरफ़ेस को बदलते देखें।',
+    labText: 'भाषा, लाइव स्टेट, वेवफ़ॉर्म और policy prompts UI को static नहीं बल्कि alive बनाते हैं।',
+    latency: 'लेटेंसी 480ms',
+    safetyOn: 'वॉइस सेफ़्टी ऑन',
+    nowSpeaking: 'अभी बोल रहा है',
+    productEyebrow: 'प्रोडक्ट कॉकपिट',
+    productTitle: 'लीड लिस्ट से लाइव कॉल्स तक एक घंटे से कम में।',
+    productText: 'कॉकपिट में queue, transcript, policy, outcome और action rails एक ही cinematic surface पर बदलते हैं।',
+    callQueue: 'कॉल कतार',
+    liveTranscript: 'लाइव ट्रांसक्रिप्ट',
+    nextAction: 'अगला एक्शन',
+    approve: 'Approve + sync',
+    usecaseTitle: 'हर repeatable phone playbook का अपना agent।',
+    safetyTitle: 'इंसानी गर्मजोशी। मशीन-लेवल कंट्रोल।',
+    pricingTitle: 'आपका अगला ग्राहक पहले से कॉल कर रहा है। CallSetu को जवाब देने दें।',
+  },
+  Hinglish: {
+    nav: ['Voice lab', 'Story', 'Product', 'Use cases', 'Safety'],
+    navCta: 'Test call book karo',
+    heroEyebrow: 'Cinematic voice AI command center',
+    heroTitleA: 'Har call ban jaati hai',
+    heroTitleB: 'ek moving story.',
+    heroValue: 'AI voice agents jo answer, qualify, book aur CRM sync karte hain.',
+    heroText: 'CallSetu lead lists ko warm multilingual conversations mein badalta hai — first ring se booked outcome tak live transcript, policy rails, CRM sync aur human handoff ke saath.',
+    heroPrimary: 'Live AI call try karo',
+    heroSecondary: 'Flow dekho',
+    heroProof: ['Hindi + Hinglish + regional modes', 'One playbook ke baad first test calls', 'AI ko rukna ho toh human handoff'],
+    proofEyebrow: 'Operational proof',
+    proofTitle: 'India ke high-volume customer calls ke liye built.',
+    proofText: 'Chatbot skin nahi — response windows, outcomes, recordings, handoffs aur CRM-ready proof wala calling system.',
+    labEyebrow: 'Interactive voice lab',
+    labTitle: 'Voice tap karo. Interface ko breathe karte dekho.',
+    labText: 'Language, live states, waveforms aur policy prompts product ko static nahi, alive feel karwate hain.',
+    latency: 'Latency 480ms',
+    safetyOn: 'Voice safety on',
+    nowSpeaking: 'Ab bol raha hai',
+    productEyebrow: 'Product cockpit',
+    productTitle: 'Lead list se live calls under one hour.',
+    productText: 'Cockpit queue, transcript, policy, outcome aur action rails ko ek cinematic surface mein dikhata hai.',
+    callQueue: 'Call queue',
+    liveTranscript: 'Live transcript',
+    nextAction: 'Next action',
+    approve: 'Approve + sync',
+    usecaseTitle: 'Har repeatable phone playbook ka apna agent.',
+    safetyTitle: 'Human warmth. Machine-level control.',
+    pricingTitle: 'Next customer already call kar raha hai. CallSetu ko answer karne do.',
+  },
+  Kannada: {
+    nav: ['ವಾಯ್ಸ್ ಲ್ಯಾಬ್', 'ಕಥೆ', 'ಉತ್ಪನ್ನ', 'ಬಳಕೆಗಳು', 'ಭದ್ರತೆ'],
+    navCta: 'ಟೆಸ್ಟ್ ಕಾಲ್ ಬುಕ್ ಮಾಡಿ',
+    heroEyebrow: 'ಸಿನೆಮಾಟಿಕ್ ವಾಯ್ಸ್ AI ಕಮಾಂಡ್ ಸೆಂಟರ್',
+    heroTitleA: 'ಪ್ರತಿ ಕರೆ ಆಗುತ್ತದೆ',
+    heroTitleB: 'ಚಲಿಸುವ ಕಥೆ.',
+    heroValue: 'ಪ್ರತಿ ಗ್ರಾಹಕ ಕರೆ answer, qualify, book ಮತ್ತು sync ಮಾಡುವ AI voice agents.',
+    heroText: 'CallSetu lead lists ಅನ್ನು warm multilingual conversations ಆಗಿ ಮಾಡುತ್ತದೆ — first ring ನಿಂದ booked outcome ವರೆಗೆ live transcripts, policy rails, CRM syncs ಮತ್ತು human handoffs ಜೊತೆ.',
+    heroPrimary: 'ಲೈವ್ AI ಕಾಲ್ ಪ್ರಯತ್ನಿಸಿ',
+    heroSecondary: 'ಫ್ಲೋ ನೋಡಿ',
+    heroProof: ['Hindi + Hinglish + regional language modes', 'ಒಂದು playbook setup ನಂತರ test calls', 'AI ನಿಲ್ಲಬೇಕಾದಾಗ human handoff'],
+    proofEyebrow: 'Operational proof',
+    proofTitle: 'India high-volume customer calls ಗಾಗಿ ನಿರ್ಮಿತ.',
+    proofText: 'Chatbot skin ಅಲ್ಲ — response windows, outcomes, recordings, handoffs ಮತ್ತು CRM-ready proof ಇರುವ calling system.',
+    labEyebrow: 'Interactive voice lab',
+    labTitle: 'Voice ಆಯ್ಕೆ ಮಾಡಿ. Interface ಬದಲಾವಣೆಯನ್ನು ನೋಡಿ.',
+    labText: 'Language, live states, waveforms ಮತ್ತು policy prompts product ಅನ್ನು alive ಮಾಡುತ್ತವೆ.',
+    latency: 'Latency 480ms',
+    safetyOn: 'Voice safety on',
+    nowSpeaking: 'ಈಗ ಮಾತನಾಡುತ್ತಿದೆ',
+    productEyebrow: 'Product cockpit',
+    productTitle: 'Lead list ಇಂದ live calls ಗೆ ಒಂದು ಗಂಟೆಯೊಳಗೆ.',
+    productText: 'Cockpit queue, transcript, policy, outcome ಮತ್ತು action rails ಅನ್ನು ಒಂದೇ cinematic surface ನಲ್ಲಿ ತೋರಿಸುತ್ತದೆ.',
+    callQueue: 'Call queue',
+    liveTranscript: 'Live transcript',
+    nextAction: 'Next action',
+    approve: 'Approve + sync',
+    usecaseTitle: 'ಪ್ರತಿ repeatable phone playbook ಗೆ ತನ್ನದೇ agent.',
+    safetyTitle: 'Human warmth. Machine-level control.',
+    pricingTitle: 'ನಿಮ್ಮ ಮುಂದಿನ customer ಈಗಾಗಲೇ call ಮಾಡುತ್ತಿದ್ದಾರೆ. CallSetu answer ಮಾಡಲಿ.',
+  },
+  Tamil: {
+    nav: ['வாய்ஸ் லேப்', 'கதை', 'பொருள்', 'பயன்பாடுகள்', 'பாதுகாப்பு'],
+    navCta: 'டெஸ்ட் கால் பதிவு',
+    heroEyebrow: 'Cinematic voice AI command center',
+    heroTitleA: 'ஒவ்வொரு கால் மாறும்',
+    heroTitleB: 'ஒரு நகரும் கதையாக.',
+    heroValue: 'ஒவ்வொரு customer call-ஐ answer, qualify, book, sync செய்யும் AI voice agents.',
+    heroText: 'CallSetu lead lists-ஐ warm multilingual conversations-ஆக மாற்றி, first ring முதல் booked outcome வரை live transcripts, policy rails, CRM syncs, human handoffs உடன் காட்டுகிறது.',
+    heroPrimary: 'Live AI call முயற்சி',
+    heroSecondary: 'Flow பார்க்க',
+    heroProof: ['Hindi + Hinglish + regional modes', 'ஒரு playbook setupக்கு பின் test calls', 'AI நிற்க வேண்டிய இடத்தில் human handoff'],
+    proofEyebrow: 'Operational proof',
+    proofTitle: 'India high-volume customer calls க்காக built.',
+    proofText: 'Chatbot skin அல்ல — response windows, outcomes, recordings, handoffs, CRM-ready proof கொண்ட calling system.',
+    labEyebrow: 'Interactive voice lab',
+    labTitle: 'Voice தேர்வு செய்யுங்கள். Interface மாறுவதைப் பாருங்கள்.',
+    labText: 'Language, live states, waveforms, policy prompts product-ஐ static அல்ல alive ஆக உணரச் செய்கின்றன.',
+    latency: 'Latency 480ms',
+    safetyOn: 'Voice safety on',
+    nowSpeaking: 'இப்போது பேசுகிறது',
+    productEyebrow: 'Product cockpit',
+    productTitle: 'Lead list முதல் live calls வரை ஒரு மணி நேரத்திற்குள்.',
+    productText: 'Cockpit queue, transcript, policy, outcome, action rails அனைத்தையும் cinematic surface-ல் காட்டுகிறது.',
+    callQueue: 'Call queue',
+    liveTranscript: 'Live transcript',
+    nextAction: 'Next action',
+    approve: 'Approve + sync',
+    usecaseTitle: 'ஒவ்வொரு repeatable phone playbook க்கும் தனி agent.',
+    safetyTitle: 'Human warmth. Machine-level control.',
+    pricingTitle: 'உங்கள் அடுத்த customer ஏற்கனவே call செய்கிறார். CallSetu answer செய்யட்டும்.',
+  },
+  Telugu: {
+    nav: ['వాయిస్ ల్యాబ్', 'కథ', 'ప్రోడక్ట్', 'వినియోగాలు', 'సేఫ్టీ'],
+    navCta: 'టెస్ట్ కాల్ బుక్ చేయండి',
+    heroEyebrow: 'Cinematic voice AI command center',
+    heroTitleA: 'ప్రతి కాల్ అవుతుంది',
+    heroTitleB: 'కదిలే కథగా.',
+    heroValue: 'ప్రతి customer call ను answer, qualify, book, sync చేసే AI voice agents.',
+    heroText: 'CallSetu lead lists ను warm multilingual conversations గా మార్చి, first ring నుంచి booked outcome వరకు live transcripts, policy rails, CRM syncs, human handoffs తో చూపిస్తుంది.',
+    heroPrimary: 'Live AI call ప్రయత్నించండి',
+    heroSecondary: 'Flow చూడండి',
+    heroProof: ['Hindi + Hinglish + regional modes', 'ఒక playbook setup తర్వాత test calls', 'AI ఆగాల్సినప్పుడు human handoff'],
+    proofEyebrow: 'Operational proof',
+    proofTitle: 'India high-volume customer calls కోసం built.',
+    proofText: 'Chatbot skin కాదు — response windows, outcomes, recordings, handoffs మరియు CRM-ready proof ఉన్న calling system.',
+    labEyebrow: 'Interactive voice lab',
+    labTitle: 'Voice ఎంచుకోండి. Interface మారుతున్నట్టు చూడండి.',
+    labText: 'Language, live states, waveforms, policy prompts product ను static కాకుండా alive గా చేస్తాయి.',
+    latency: 'Latency 480ms',
+    safetyOn: 'Voice safety on',
+    nowSpeaking: 'ఇప్పుడు మాట్లాడుతోంది',
+    productEyebrow: 'Product cockpit',
+    productTitle: 'Lead list నుంచి live calls వరకు ఒక గంటలోపు.',
+    productText: 'Cockpit queue, transcript, policy, outcome, action rails అన్నీ ఒక cinematic surface లో చూపిస్తుంది.',
+    callQueue: 'Call queue',
+    liveTranscript: 'Live transcript',
+    nextAction: 'Next action',
+    approve: 'Approve + sync',
+    usecaseTitle: 'ప్రతి repeatable phone playbook కి తన agent.',
+    safetyTitle: 'Human warmth. Machine-level control.',
+    pricingTitle: 'మీ next customer ఇప్పటికే call చేస్తున్నారు. CallSetu answer చేయనివ్వండి.',
+  },
+}
+
+const localizedLines: Record<LanguageMode, { customer: string; agent: string; prompt: string; voiceLine: string }> = {
+  English: {
+    customer: 'Can I come this Saturday?',
+    agent: 'Yes, I can book that. Which showroom is closest?',
+    prompt: '“Hello Rohan, you showed interest in a Nexon EV test-drive. I can help you pick the nearest showroom and slot.”',
+    voiceLine: 'confirms a Tata Nexon test drive in warm English.',
+  },
+  Hindi: {
+    customer: 'क्या मैं इस शनिवार आ सकता हूँ?',
+    agent: 'हाँ, मैं स्लॉट बुक कर सकती हूँ। कौन सा showroom पास है?',
+    prompt: '“Namaste Rohan ji, aapne Nexon EV test-drive ke liye interest dikhaya tha…”',
+    voiceLine: 'गर्म Hindi में Tata Nexon test drive confirm करती है।',
+  },
+  Hinglish: {
+    customer: 'Can I come this Saturday?',
+    agent: 'Haan, main book kar deti hoon. Kaunsa showroom closest hai?',
+    prompt: '“Namaste Rohan ji, aapne Nexon EV test-drive ke liye interest dikhaya tha…”',
+    voiceLine: 'warm Hinglish mein Tata Nexon test drive confirm karti hai.',
+  },
+  Kannada: {
+    customer: 'ಈ Saturday ಬರಬಹುದಾ?',
+    agent: 'ಹೌದು, ನಾನು slot book ಮಾಡಬಹುದು. ಯಾವ showroom ಹತ್ತಿರ?',
+    prompt: '“Namaskara Rohan avare, Nexon EV test-drive ge interest thorisiddiri…”',
+    voiceLine: 'Bangalore Kannada-Hinglish ನಲ್ಲಿ Tata Nexon test drive confirm ಮಾಡುತ್ತಾಳೆ.',
+  },
+  Tamil: {
+    customer: 'இந்த Saturday வரலாமா?',
+    agent: 'ஆம், slot book செய்யலாம். எந்த showroom அருகில் உள்ளது?',
+    prompt: '“Vanakkam Rohan, Nexon EV test-drive interest share pannirkeenga…”',
+    voiceLine: 'Tamil-English mix-ல் Tata Nexon test drive confirm செய்கிறாள்.',
+  },
+  Telugu: {
+    customer: 'ఈ Saturday రావచ్చా?',
+    agent: 'అవును, slot book చేస్తాను. ఏ showroom దగ్గరగా ఉంది?',
+    prompt: '“Namaskaram Rohan garu, Nexon EV test-drive meeda interest chupinchaaru…”',
+    voiceLine: 'Telugu-English mix లో Tata Nexon test drive confirm చేస్తుంది.',
+  },
+}
+
+const operatorScenarios: Record<OperatorMode, {
+  label: OperatorMode
+  state: string
+  browserPath: string
+  queue: string[][]
+  trace: string[][]
+  outcomeTitle: string
+  outcomeDetail: string
+  cta: string
+  statusCopy: string
+  pulse: string
+}> = {
+  'Pause campaign': {
+    label: 'Pause campaign',
+    state: 'paused',
+    browserPath: 'campaigns/tata-nexon-q2/paused',
+    queue: [
+      ['Rohan P.', 'Hinglish', 'Test drive', 'Held'],
+      ['Ananya S.', 'English', 'Exchange offer', 'Queued'],
+      ['Vivek K.', 'Hindi', 'Callback', 'Frozen'],
+      ['Mehul R.', 'Kannada', 'Retry', 'Paused'],
+    ],
+    trace: [
+      ['00:00', 'Supervisor paused new outbound dials', 'CONTROL'],
+      ['00:02', 'Active calls finish; no fresh calls started', 'QUEUE'],
+      ['00:05', 'Retry window and lead ageing timers frozen', 'SAFE'],
+      ['00:08', 'Manager alert sent with pause reason', 'ALERT'],
+      ['00:11', 'Campaign ready to resume from exact queue state', 'SYNC'],
+    ],
+    outcomeTitle: 'Campaign paused safely',
+    outcomeDetail: 'No new dials · active conversations finish · queue state preserved',
+    cta: 'Resume campaign',
+    statusCopy: 'Outbound throttle is now 0%. The UI switches from live calling to safe-hold mode.',
+    pulse: 'Paused · no new dials',
+  },
+  'Edit script': {
+    label: 'Edit script',
+    state: 'editing',
+    browserPath: 'campaigns/tata-nexon-q2/script-draft',
+    queue: [
+      ['Rohan P.', 'Hinglish', 'Test drive', 'Previewing'],
+      ['Ananya S.', 'English', 'Exchange offer', 'Needs rule'],
+      ['Vivek K.', 'Hindi', 'Callback', 'Script check'],
+      ['Mehul R.', 'Kannada', 'Retry', 'Localized'],
+    ],
+    trace: [
+      ['00:00', 'Script editor opened for exchange-bonus objection', 'DRAFT'],
+      ['00:06', 'New approved line inserted: “offer depends on vehicle inspection”', 'POLICY'],
+      ['00:14', 'Hindi, Hinglish, and Kannada variants generated for review', 'LANG'],
+      ['00:24', 'Forbidden discount promise remains locked', 'GUARDRAIL'],
+      ['00:32', 'Dry-run transcript updated before campaign resumes', 'PREVIEW'],
+    ],
+    outcomeTitle: 'Script draft staged',
+    outcomeDetail: '3 language variants · 1 guardrail lock · awaiting approval',
+    cta: 'Approve script',
+    statusCopy: 'The transcript rail becomes a script preview and the next-action panel waits for approval.',
+    pulse: 'Draft mode · calls held',
+  },
+  'Review low-confidence': {
+    label: 'Review low-confidence',
+    state: 'reviewing',
+    browserPath: 'campaigns/tata-nexon-q2/review-low-confidence',
+    queue: [
+      ['Rohan P.', 'Hinglish', 'Test drive', '91% confident'],
+      ['Ananya S.', 'English', 'Exchange offer', '64% review'],
+      ['Vivek K.', 'Hindi', 'Callback', '58% review'],
+      ['Mehul R.', 'Kannada', 'Not reachable', 'Retry ok'],
+    ],
+    trace: [
+      ['00:00', 'Low-confidence filter applied to calls below 70%', 'FILTER'],
+      ['00:04', 'Ananya asked for “final on-road after exchange”', 'FLAG'],
+      ['00:10', 'Vivek mixed Hindi with noisy background audio', 'ASR'],
+      ['00:18', 'Reviewer sees recording, transcript, and suggested disposition', 'REVIEW'],
+      ['00:31', 'Approved records sync; uncertain records stay in review', 'SYNC'],
+    ],
+    outcomeTitle: '2 calls need review',
+    outcomeDetail: 'Confidence below threshold · human decision required before CRM update',
+    cta: 'Open review desk',
+    statusCopy: 'The cockpit narrows to uncertain conversations and highlights confidence risk.',
+    pulse: 'Review queue · 2 flagged',
+  },
+  'Escalate hot lead': {
+    label: 'Escalate hot lead',
+    state: 'escalating',
+    browserPath: 'campaigns/tata-nexon-q2/hot-lead-escalation',
+    queue: [
+      ['Rohan P.', 'Hinglish', 'Test drive', 'Hot lead'],
+      ['Ananya S.', 'English', 'Exchange offer', 'Interested'],
+      ['Vivek K.', 'Hindi', 'Callback', 'Warm'],
+      ['Mehul R.', 'Kannada', 'Retry', 'Cold'],
+    ],
+    trace: [
+      ['00:00', 'Rohan asks for same-day showroom visit', 'INTENT'],
+      ['00:04', 'Budget, model, and location qualify as hot lead', 'SCORE'],
+      ['00:09', 'AI confirms consent to share details with salesperson', 'CONSENT'],
+      ['00:15', 'Sales manager gets WhatsApp + CRM alert', 'ALERT'],
+      ['00:22', 'Lead pinned to top of callback board', 'SYNC'],
+    ],
+    outcomeTitle: 'Hot lead escalated',
+    outcomeDetail: 'Sales manager alerted · WhatsApp summary sent · callback SLA 5 min',
+    cta: 'View escalation',
+    statusCopy: 'The UI switches to urgency mode: score, consent, alert, and SLA become the hero.',
+    pulse: 'Escalated · manager pinged',
+  },
+  'Export report': {
+    label: 'Export report',
+    state: 'exporting',
+    browserPath: 'campaigns/tata-nexon-q2/export-report',
+    queue: [
+      ['Rohan P.', 'Hinglish', 'Test drive', 'Included'],
+      ['Ananya S.', 'English', 'Exchange offer', 'Included'],
+      ['Vivek K.', 'Hindi', 'Callback', 'Included'],
+      ['Mehul R.', 'Kannada', 'Retry', 'Included'],
+    ],
+    trace: [
+      ['00:00', 'Report range set to current campaign window', 'REPORT'],
+      ['00:03', 'Call summaries, recordings, outcomes, and dispositions packed', 'DATA'],
+      ['00:07', 'Language and confidence breakdown calculated', 'ANALYTICS'],
+      ['00:11', 'CSV, PDF, and CRM export links generated', 'EXPORT'],
+      ['00:16', 'Report delivered to owner and sales manager', 'DONE'],
+    ],
+    outcomeTitle: 'Report ready',
+    outcomeDetail: 'CSV + PDF + CRM export · language split · outcome summary',
+    cta: 'Download report',
+    statusCopy: 'The cockpit becomes an export console with all rows included in the campaign report.',
+    pulse: 'Report ready · 4 rows',
+  },
+}
+
+
+const operatorControls: OperatorMode[] = ['Pause campaign', 'Edit script', 'Review low-confidence', 'Escalate hot lead', 'Export report']
 
 const safetyGroups = [
   ['Consent & windows', 'DND windows, opt-outs, recording disclosures, and retry limits stay configurable.'],
@@ -283,6 +668,8 @@ function ScrollStory() {
 
 function App() {
   const [activeVoice, setActiveVoice] = useState(0)
+  const [activeLanguage, setActiveLanguage] = useState<LanguageMode>('Hinglish')
+  const [activeOperator, setActiveOperator] = useState<OperatorMode>('Escalate hot lead')
   const heroRef = useRef<HTMLElement | null>(null)
   const { scrollYProgress } = useScroll()
   const smoothProgress = useSpring(scrollYProgress, { stiffness: 90, damping: 24 })
@@ -290,6 +677,10 @@ function App() {
   const heroY = useTransform(heroProgress, [0, 1], [0, 110])
   const heroRotate = useTransform(heroProgress, [0, 1], [-4, 8])
   const active = voiceScenes[activeVoice]
+  const t = pageCopy[activeLanguage]
+  const localized = localizedLines[activeLanguage]
+  const operator = operatorScenarios[activeOperator]
+  const localizedVoiceLine = `${active.title} ${localized.voiceLine}`
 
   return (
     <main className="site-shell">
@@ -301,35 +692,33 @@ function App() {
           <span>CallSetu</span>
         </a>
         <div className="nav-links">
-          <a href="#voice-lab">Voice lab</a>
-          <a href="#story">Story</a>
-          <a href="#product">Product</a>
-          <a href="#use-cases">Use cases</a>
-          <a href="#safety">Safety</a>
+          <a href="#voice-lab">{t.nav[0]}</a>
+          <a href="#story">{t.nav[1]}</a>
+          <a href="#product">{t.nav[2]}</a>
+          <a href="#use-cases">{t.nav[3]}</a>
+          <a href="#safety">{t.nav[4]}</a>
         </div>
         <a className="nav-cta" href="mailto:hello@callsetu.ai?subject=Book%20a%20CallSetu%20test%20call">
-          Book test call <ArrowUpRight size={16} />
+          {t.navCta} <ArrowUpRight size={16} />
         </a>
       </nav>
 
       <section id="top" className="hero" ref={heroRef}>
         <motion.div className="hero-copy" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-          <p className="eyebrow"><Sparkles size={14} /> Cinematic voice AI command center</p>
+          <p className="eyebrow"><Sparkles size={14} /> {t.heroEyebrow}</p>
           <h1>
-            Every call becomes <span>a moving story.</span>
+            {t.heroTitleA} <span>{t.heroTitleB}</span>
           </h1>
-          <p className="hero-value">AI voice agents that answer, qualify, book, and sync every customer call.</p>
-          <p className="hero-text">
-            CallSetu turns lead lists into warm, multilingual conversations — then shows the journey from first ring to booked outcome with live transcripts, policy rails, CRM syncs, and human handoffs.
-          </p>
+          <p className="hero-value">{t.heroValue}</p>
+          <p className="hero-text">{t.heroText}</p>
           <div className="hero-actions">
-            <a className="button primary magnet" href="mailto:hello@callsetu.ai?subject=Take%20a%20CallSetu%20test%20call"><PhoneCall size={18} /> Try a live AI call</a>
-            <a className="button glass magnet" href="#story"><Play size={18} /> Watch the flow</a>
+            <a className="button primary magnet" href="mailto:hello@callsetu.ai?subject=Take%20a%20CallSetu%20test%20call"><PhoneCall size={18} /> {t.heroPrimary}</a>
+            <a className="button glass magnet" href="#story"><Play size={18} /> {t.heroSecondary}</a>
           </div>
           <div className="hero-proof" aria-label="Campaign proof">
-            <span><CircleDot size={13} /> Hindi + Hinglish + regional language modes</span>
-            <span><CircleDot size={13} /> First test calls after one playbook setup</span>
-            <span><CircleDot size={13} /> Human handoff when the AI should stop</span>
+            <span><CircleDot size={13} /> {t.heroProof[0]}</span>
+            <span><CircleDot size={13} /> {t.heroProof[1]}</span>
+            <span><CircleDot size={13} /> {t.heroProof[2]}</span>
           </div>
         </motion.div>
 
@@ -340,7 +729,7 @@ function App() {
           <motion.div className="call-card floating-card top-card" animate={{ y: [0, -12, 0] }} transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}>
             <span className="mini-label">LIVE AGENT</span>
             <strong>{active.title} · {active.meta}</strong>
-            <p>{active.prompt}</p>
+            <p>{localized.prompt}</p>
           </motion.div>
           <motion.div className="call-card floating-card bottom-card" animate={{ y: [0, 14, 0] }} transition={{ duration: 5.6, repeat: Infinity, ease: 'easeInOut' }}>
             <span className="mini-label">OUTCOME</span>
@@ -360,9 +749,9 @@ function App() {
 
       <section className="proof-section" aria-label="CallSetu proof and operating metrics">
         <div className="proof-intro">
-          <p className="eyebrow"><Sparkles size={14} /> Operational proof</p>
-          <h2>Built for high-volume customer calls in India.</h2>
-          <p>Not a chatbot skin — a calling system with response windows, outcomes, recordings, handoffs, and CRM-ready proof.</p>
+          <p className="eyebrow"><Sparkles size={14} /> {t.proofEyebrow}</p>
+          <h2>{t.proofTitle}</h2>
+          <p>{t.proofText}</p>
         </div>
         <div className="metrics">
           {metrics.map((item, index) => (
@@ -386,9 +775,9 @@ function App() {
 
       <section id="voice-lab" className="section voice-lab">
         <div className="section-heading center">
-          <p className="eyebrow"><Mic2 size={14} /> Interactive voice lab</p>
-          <h2>Tap a voice. Watch the interface breathe.</h2>
-          <p>Tabs, live states, hover depth, animated waveforms, and realistic policy prompts make the product feel alive instead of static.</p>
+          <p className="eyebrow"><Mic2 size={14} /> {t.labEyebrow}</p>
+          <h2>{t.labTitle}</h2>
+          <p>{t.labText}</p>
         </div>
         <div className="lab-shell">
           <aside className="voice-list">
@@ -403,15 +792,24 @@ function App() {
           <motion.div className="studio-panel" key={active.title} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.34 }}>
             <div className="studio-top">
               <span className="recording"><Zap size={14} /> realtime preview</span>
-              <span>Latency 480ms</span>
-              <span>Voice safety on</span>
+              <span>{t.latency}</span>
+              <span>{t.safetyOn}</span>
             </div>
             <div className="language-strip" aria-label="Language modes">
-              {languages.map((language, index) => <button className={index === 2 ? 'active' : ''} key={language}>{language}</button>)}
+              {languages.map((language) => (
+                <button
+                  className={language === activeLanguage ? 'active' : ''}
+                  key={language}
+                  onClick={() => setActiveLanguage(language)}
+                  aria-pressed={language === activeLanguage}
+                >
+                  {languageLabels[language]}
+                </button>
+              ))}
             </div>
             <div className="studio-copy">
-              <p className="mini-label">NOW SPEAKING</p>
-              <h3>{active.line}</h3>
+              <p className="mini-label">{t.nowSpeaking}</p>
+              <h3>{localizedVoiceLine}</h3>
             </div>
             <div className="voice-demo-grid">
               <div>
@@ -419,14 +817,14 @@ function App() {
                 <WaveBars />
               </div>
               <div className="mini-transcript">
-                <p><b>Customer</b> “Can I come this Saturday?”</p>
-                <p><b>{active.title}</b> “Yes, I can book that. Which showroom is closest?”</p>
+                <p><b>Customer</b> “{localized.customer}”</p>
+                <p><b>{active.title}</b> “{localized.agent}”</p>
                 <span>{active.outcome}</span>
               </div>
             </div>
             <div className="prompt-card">
               <Headphones size={18} />
-              <p>{active.prompt}</p>
+              <p>{localized.prompt}</p>
             </div>
           </motion.div>
         </div>
@@ -436,25 +834,25 @@ function App() {
 
       <section id="product" className="section product-section">
         <div className="section-heading">
-          <p className="eyebrow"><Workflow size={14} /> Product cockpit</p>
-          <h2>From lead list to live calls in under an hour.</h2>
-          <p>The cockpit is now part dashboard, part animated evidence: queue, transcript, policy, outcome, and action rails in one cinematic surface.</p>
+          <p className="eyebrow"><Workflow size={14} /> {t.productEyebrow}</p>
+          <h2>{t.productTitle}</h2>
+          <p>{t.productText}</p>
         </div>
         <div className="cockpit">
-          <motion.div className="cockpit-main" whileInView={{ rotateX: [4, 0], y: [30, 0], opacity: [0.82, 1] }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: 0.75 }}>
-            <div className="browser-bar"><i /><i /><i /><span>campaigns/tata-nexon-q2/live</span></div>
+          <motion.div className={`cockpit-main is-${operator.state}`} whileInView={{ rotateX: [4, 0], y: [30, 0], opacity: [0.82, 1] }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: 0.75 }}>
+            <div className="browser-bar"><i /><i /><i /><span>{operator.browserPath}</span></div>
             <div className="cockpit-grid">
               <div className="queue-panel panel">
-                <p className="mini-label">CALL QUEUE</p>
-                {cockpitLeads.map(([name, lang, intent, status], index) => (
+                <p className="mini-label">{t.callQueue}</p>
+                {operator.queue.map(([name, lang, intent, status], index) => (
                   <motion.span initial={{ x: -14, opacity: 0 }} whileInView={{ x: 0, opacity: 1 }} transition={{ delay: index * 0.08 }} key={name}>
                     <b>{name}</b><small>{lang} · {intent}</small><em>{status}</em>
                   </motion.span>
                 ))}
               </div>
               <div className="transcript-panel panel">
-                <p className="mini-label">LIVE TRANSCRIPT</p>
-                {trace.map(([time, text, tag], index) => (
+                <p className="mini-label">{t.liveTranscript}</p>
+                {operator.trace.map(([time, text, tag], index) => (
                   <motion.div className="trace-row" key={time} initial={{ opacity: 0, y: 8 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.09 }}>
                     <time>{time}</time>
                     <p>{text}</p>
@@ -463,15 +861,29 @@ function App() {
                 ))}
               </div>
               <div className="outcome-panel panel">
-                <p className="mini-label">NEXT ACTION</p>
+                <p className="mini-label">{t.nextAction}</p>
                 <CalendarCheck size={34} />
-                <h3>Book test drive</h3>
-                <p>Saturday · 4:30 PM · Whitefield showroom</p>
-                <button>Approve + sync</button>
+                <h3>{operator.outcomeTitle}</h3>
+                <p>{operator.outcomeDetail}</p>
+                <button>{operator.cta}</button>
               </div>
             </div>
-            <div className="operator-controls">
-              {operatorControls.map((control) => <button key={control}>{control}</button>)}
+            <motion.div className="campaign-state" key={activeOperator} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+              <span>{operator.pulse}</span>
+              <p>{operator.statusCopy}</p>
+              <div className="action-rail" aria-hidden="true"><i /><i /><i /></div>
+            </motion.div>
+            <div className="operator-controls" aria-label="Operator controls">
+              {operatorControls.map((control) => (
+                <button
+                  className={control === activeOperator ? 'active' : ''}
+                  key={control}
+                  onClick={() => setActiveOperator(control)}
+                  aria-pressed={control === activeOperator}
+                >
+                  {control}
+                </button>
+              ))}
             </div>
           </motion.div>
           <div className="setup-flow">
@@ -494,7 +906,7 @@ function App() {
       <section id="use-cases" className="section usecase-section">
         <div className="section-heading center">
           <p className="eyebrow"><CircleDot size={14} /> Use-case gallery</p>
-          <h2>Every repeatable phone playbook gets its own agent.</h2>
+          <h2>{t.usecaseTitle}</h2>
         </div>
         <div className="usecase-grid">
           {useCases.map(([title, copy, stat], index) => (
@@ -521,7 +933,7 @@ function App() {
       <section id="safety" className="section safety-section">
         <div className="safety-card">
           <p className="eyebrow"><ShieldCheck size={14} /> Trust layer</p>
-          <h2>Human warmth. Machine-level control.</h2>
+          <h2>{t.safetyTitle}</h2>
           <p>Every call is recorded, transcribed, tagged, constrained by policy, and synced to your systems. If a caller asks for a manager, discount, medical advice, or unusual promise, CallSetu hands off.</p>
           <div className="safety-grid">
             {safetyGroups.map(([title, copy]) => (
@@ -545,7 +957,7 @@ function App() {
       <section id="pricing" className="section pricing-section">
         <div className="pricing-card">
           <p className="eyebrow"><Sparkles size={14} /> Start with one campaign</p>
-          <h2>Your next customer is already calling. Let CallSetu answer.</h2>
+          <h2>{t.pricingTitle}</h2>
           <p>Start with one campaign. No full migration. We configure the voice, test objections, connect outcomes, and launch a real pilot with your team.</p>
           <div className="price-row"><strong>₹3–6/min</strong><span>usage-based · varies by language, telephony, and workflow depth</span></div>
           <div className="pilot-box">
