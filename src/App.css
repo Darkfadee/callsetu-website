@@ -488,7 +488,29 @@ h1, h2, h3, p { margin-top: 0; }
     linear-gradient(135deg, rgba(255,255,255,.075), rgba(255,255,255,.025));
   box-shadow: var(--shadow);
 }
-.proof-layout { display: grid; grid-template-columns: minmax(290px, .75fr) minmax(0, 1.25fr); gap: clamp(30px, 4vw, 58px); align-items: end; }
+.proof-layout { display: grid; grid-template-columns: minmax(290px, .75fr) minmax(0, 1.25fr); gap: clamp(30px, 4vw, 58px); align-items: stretch; }
+.proof-right { display:grid; gap:16px; align-content:stretch; }
+.proof-signal-card {
+  min-height: 178px;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(210px,.62fr);
+  gap:16px;
+  align-items:stretch;
+  padding:24px;
+  border:1px solid rgba(255,219,177,.2);
+  border-radius:30px;
+  background:
+    radial-gradient(circle at 10% 0, rgba(255,157,61,.2), transparent 42%),
+    radial-gradient(circle at 100% 100%, rgba(141,247,236,.16), transparent 42%),
+    rgba(0,0,0,.22);
+  box-shadow:var(--shadow);
+}
+.proof-signal-card small { color:var(--cyan); font-family:'JetBrains Mono', monospace; font-size:11px; font-weight:800; letter-spacing:.1em; }
+.proof-signal-card b { display:block; margin:10px 0 8px; color:#fff7ea; font-size:clamp(25px,2.4vw,36px); line-height:1; letter-spacing:-.06em; }
+.proof-signal-card p { margin:0; color:var(--muted); font-size:16px; line-height:1.5; }
+.proof-signal-card ul { margin:0; padding:0; list-style:none; display:grid; gap:8px; }
+.proof-signal-card li { display:flex; justify-content:space-between; gap:12px; padding:13px 14px; border:1px solid rgba(255,219,177,.14); border-radius:14px; color:#f5e5ce; background:rgba(255,255,255,.04); font-size:15px; }
+.proof-signal-card li span { color:var(--amber-2); font-family:'JetBrains Mono', monospace; font-weight:800; }
 .leak-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; }
 .leak-grid article, .workflow-step, .panel, .safety-card, .integration-card, .pilot-card, .playbook-detail, .studio-panel, .voice-rail button {
   border: 1px solid var(--line);
@@ -701,7 +723,7 @@ time { color:var(--amber-2); font-family:'JetBrains Mono', monospace; font-size:
   .nav-links { display: none; }
   .hero-route, .workflow-road { grid-template-columns: repeat(2,minmax(0,1fr)); }
   .workflow-road::before { display:none; }
-  .proof-layout, .cockpit-grid, .playbook-detail, .safety-section { grid-template-columns: 1fr; }
+  .proof-layout, .proof-signal-card, .cockpit-grid, .playbook-detail, .safety-section { grid-template-columns: 1fr; }
   .voice-stage { grid-template-columns: 1fr; }
   .voice-rail { grid-template-columns: repeat(3,minmax(0,1fr)); }
 }
@@ -724,8 +746,12 @@ time { color:var(--amber-2); font-family:'JetBrains Mono', monospace; font-size:
   .hero-translation-card, .hero-proof-card { position: static; width: auto; }
   .hero-route, .leak-grid, .workflow-road, .safety-grid, .partner-grid { grid-template-columns: 1fr; }
   .proof-section, .studio-panel, .cockpit, .playbook-detail, .safety-card, .integration-card, .pilot-card, .footer { border-radius: 34px; padding: 24px; }
-  .section { padding-top: 112px; }
+  .section { padding-top: 86px; }
   .section-heading h2, .proof-layout h2, .safety-card h2, .pilot-card h2 { font-size: clamp(40px, 11vw, 60px); line-height:.96; }
+  .section-heading { margin-bottom: 34px; }
+  .leak-grid article, .workflow-step { min-height: auto; padding: 22px; }
+  .workflow-step h3 { margin-top: 26px; }
+  .proof-signal-card { min-height:auto; }
   .voice-rail { grid-template-columns: 1fr; }
   .voice-copy, .transcript-grid { grid-template-columns: 1fr; }
   .trace-row, .campaign-state { grid-template-columns: 1fr; }
