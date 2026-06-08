@@ -21,6 +21,14 @@ import './App.css'
 type LanguageMode = 'English' | 'Hindi' | 'Hinglish' | 'Kannada' | 'Tamil' | 'Telugu'
 type OperatorMode = 'Pause campaign' | 'Edit script' | 'Review low-confidence' | 'Escalate hot lead' | 'Export report'
 type PlaybookKey = 'Auto' | 'Real estate' | 'Clinics' | 'Recruiting' | 'Collections'
+type VoiceScript = {
+  customer: string
+  agent: string
+  prompt: string
+  voiceLine: string
+  outcome: string
+  context: string
+}
 
 const languages: LanguageMode[] = ['English', 'Hindi', 'Hinglish', 'Kannada', 'Tamil', 'Telugu']
 
@@ -33,45 +41,6 @@ const languageLabels: Record<LanguageMode, string> = {
   Telugu: 'తెలుగు',
 }
 
-const localizedLines: Record<LanguageMode, { customer: string; agent: string; prompt: string; voiceLine: string }> = {
-  English: {
-    customer: 'Can I come this Saturday?',
-    agent: 'Yes. I can book the nearest showroom and send you the slot now.',
-    prompt: '“Hello Rohan, you asked about a Nexon EV test drive. I can help you pick the nearest showroom and confirm a time.”',
-    voiceLine: 'speaks clear English while following the approved Tata test-drive script.',
-  },
-  Hindi: {
-    customer: 'क्या मैं इस शनिवार आ सकता हूँ?',
-    agent: 'हाँ, slot book हो जाएगा। कौन सा showroom आपके पास है?',
-    prompt: '“Namaste Rohan ji, aapne Nexon EV test-drive ke liye interest dikhaya tha…”',
-    voiceLine: 'uses Hindi to qualify the buyer and keep the handoff safe.',
-  },
-  Hinglish: {
-    customer: 'Can I come this Saturday?',
-    agent: 'Haan, slot book ho jayega. Kaunsa showroom closest hai?',
-    prompt: '“Namaste Rohan ji, aapne Nexon EV test-drive ke liye interest dikhaya tha…”',
-    voiceLine: 'uses warm Hinglish to confirm a Tata Nexon test-drive slot.',
-  },
-  Kannada: {
-    customer: 'ಈ Saturday ಬರಬಹುದಾ?',
-    agent: 'ಹೌದು, slot book ಮಾಡಬಹುದು. ಯಾವ showroom ಹತ್ತಿರ?',
-    prompt: '“Namaskara Rohan avare, Nexon EV test-drive ge interest thorisiddiri…”',
-    voiceLine: 'uses Bangalore Kannada-Hinglish to confirm the slot.',
-  },
-  Tamil: {
-    customer: 'இந்த Saturday வரலாமா?',
-    agent: 'ஆம், slot book செய்யலாம். எந்த showroom அருகில் உள்ளது?',
-    prompt: '“Vanakkam Rohan, Nexon EV test-drive interest share pannirkeenga…”',
-    voiceLine: 'uses a Tamil-English mix to confirm the appointment.',
-  },
-  Telugu: {
-    customer: 'ఈ Saturday రావచ్చా?',
-    agent: 'అవును, slot book చేస్తాను. ఏ showroom దగ్గరగా ఉంది?',
-    prompt: '“Namaskaram Rohan garu, Nexon EV test-drive meeda interest chupinchaaru…”',
-    voiceLine: 'uses a Telugu-English mix to finish the booking.',
-  },
-}
-
 const voiceAgents = [
   {
     name: 'Asha',
@@ -79,6 +48,56 @@ const voiceAgents = [
     tone: 'Warm · Hinglish',
     location: 'Bangalore',
     outcome: 'Qualified · Sat 4:30 PM',
+    scripts: {
+      English: {
+        customer: 'Can I come this Saturday for the Nexon EV test drive?',
+        agent: 'Yes. I can reserve the nearest showroom slot and send the confirmation now.',
+        prompt: '“Hello Rohan, you asked about a Nexon EV test drive. I can help you choose the nearest showroom and confirm a time.”',
+        voiceLine: 'speaks clear English for the Tata test-drive workflow.',
+        outcome: 'BOOKED · SHOWROOM ALERTED',
+        context: 'Auto dealer lead capture',
+      },
+      Hindi: {
+        customer: 'क्या मैं इस शनिवार Nexon EV की test drive के लिए आ सकता हूँ?',
+        agent: 'हाँ Rohan ji, मैं आपके नज़दीकी showroom में slot confirm कर देती हूँ और confirmation भेज देती हूँ।',
+        prompt: '“नमस्ते Rohan ji, आपने Nexon EV test drive में interest दिखाया था। मैं आपके लिए nearest showroom और timing confirm कर सकती हूँ।”',
+        voiceLine: 'Hindi में Tata test-drive lead को qualify करके showroom slot confirm करती है।',
+        outcome: 'BOOKED · SHOWROOM ALERTED',
+        context: 'Auto dealer Hindi follow-up',
+      },
+      Hinglish: {
+        customer: 'Saturday ko Nexon EV test drive mil sakti hai?',
+        agent: 'Haan Rohan ji, nearest showroom ka slot confirm kar deti hoon aur confirmation bhej deti hoon.',
+        prompt: '“Namaste Rohan ji, aapne Nexon EV test drive mein interest dikhaya tha. Main nearest showroom aur timing confirm kar sakti hoon.”',
+        voiceLine: 'warm Hinglish mein Tata Nexon test-drive slot confirm karti hai.',
+        outcome: 'BOOKED · SHOWROOM ALERTED',
+        context: 'Bangalore showroom Hinglish',
+      },
+      Kannada: {
+        customer: 'ಈ ಶನಿವಾರ Nexon EV test drive ಗೆ ಬರಬಹುದಾ?',
+        agent: 'ಹೌದು Rohan avare, ನಿಮ್ಮ ಹತ್ತಿರದ showroom slot confirm ಮಾಡಿ confirmation ಕಳುಹಿಸುತ್ತೇನೆ.',
+        prompt: '“ನಮಸ್ಕಾರ Rohan avare, ನೀವು Nexon EV test drive ಬಗ್ಗೆ interest ತೋರಿಸಿದ್ದೀರಿ. ಹತ್ತಿರದ showroom ಮತ್ತು timing confirm ಮಾಡಬಹುದು.”',
+        voiceLine: 'Kannada-English mix ನಲ್ಲಿ Tata test-drive slot confirm ಮಾಡುತ್ತದೆ.',
+        outcome: 'BOOKED · SHOWROOM ALERTED',
+        context: 'Bengaluru showroom Kannada',
+      },
+      Tamil: {
+        customer: 'இந்த Saturday Nexon EV test driveக்கு வரலாமா?',
+        agent: 'ஆம் Rohan, உங்களுக்கு அருகிலுள்ள showroom slotஐ confirm செய்து confirmation அனுப்புகிறேன்.',
+        prompt: '“வணக்கம் Rohan, நீங்கள் Nexon EV test driveக்கு interest காட்டியிருந்தீர்கள். அருகிலுள்ள showroom மற்றும் timingஐ confirm செய்யலாம்.”',
+        voiceLine: 'Tamil-English mixல் Tata test-drive slotஐ confirm செய்கிறது.',
+        outcome: 'BOOKED · SHOWROOM ALERTED',
+        context: 'Chennai showroom Tamil',
+      },
+      Telugu: {
+        customer: 'ఈ Saturday Nexon EV test driveకి రావచ్చా?',
+        agent: 'అవును Rohan garu, మీ దగ్గరలోని showroom slot confirm చేసి confirmation పంపిస్తాను.',
+        prompt: '“నమస్కారం Rohan garu, మీరు Nexon EV test drive పై interest చూపించారు. దగ్గరలోని showroom మరియు timing confirm చేయగలను.”',
+        voiceLine: 'Telugu-English mixలో Tata test-drive slot confirm చేస్తుంది.',
+        outcome: 'BOOKED · SHOWROOM ALERTED',
+        context: 'Hyderabad showroom Telugu',
+      },
+    } satisfies Record<LanguageMode, VoiceScript>,
   },
   {
     name: 'Kabir',
@@ -86,6 +105,56 @@ const voiceAgents = [
     tone: 'Calm · Hindi',
     location: 'Delhi NCR',
     outcome: 'Eligible · advisor callback',
+    scripts: {
+      English: {
+        customer: 'Can I renew my business loan this month?',
+        agent: 'Yes. I can check eligibility, confirm your preferred amount, and schedule an advisor callback.',
+        prompt: '“Hello Priya, your loan renewal window is open. I can confirm eligibility, amount range, and the best callback time.”',
+        voiceLine: 'speaks calm English for a loan-renewal qualification call.',
+        outcome: 'ELIGIBLE · ADVISOR CALLBACK',
+        context: 'Finance renewal qualification',
+      },
+      Hindi: {
+        customer: 'क्या मेरा business loan इस महीने renew हो सकता है?',
+        agent: 'हाँ Priya ji, मैं eligibility check करके amount preference confirm कर देता हूँ और advisor callback schedule कर देता हूँ।',
+        prompt: '“नमस्ते Priya ji, आपका loan renewal window open है। मैं eligibility, amount range और callback timing confirm कर सकता हूँ।”',
+        voiceLine: 'Hindi में loan-renewal buyer को calmly qualify करता है।',
+        outcome: 'ELIGIBLE · ADVISOR CALLBACK',
+        context: 'Delhi NCR Hindi finance call',
+      },
+      Hinglish: {
+        customer: 'Mera business loan iss month renew ho sakta hai?',
+        agent: 'Haan Priya ji, eligibility check karke amount preference confirm karta hoon aur advisor callback schedule karta hoon.',
+        prompt: '“Namaste Priya ji, aapka loan renewal window open hai. Main eligibility, amount range aur callback timing confirm kar sakta hoon.”',
+        voiceLine: 'calm Hinglish mein renewal intent qualify karta hai.',
+        outcome: 'ELIGIBLE · ADVISOR CALLBACK',
+        context: 'SMB finance Hinglish',
+      },
+      Kannada: {
+        customer: 'ನನ್ನ business loan ಈ ತಿಂಗಳು renew ಆಗುತ್ತದೆಯಾ?',
+        agent: 'ಹೌದು Priya avare, eligibility check ಮಾಡಿ amount preference confirm ಮಾಡುತ್ತೇನೆ ಮತ್ತು advisor callback schedule ಮಾಡುತ್ತೇನೆ.',
+        prompt: '“ನಮಸ್ಕಾರ Priya avare, ನಿಮ್ಮ loan renewal window open ಇದೆ. eligibility, amount range ಮತ್ತು callback timing confirm ಮಾಡಬಹುದು.”',
+        voiceLine: 'Kannada-English mix ನಲ್ಲಿ renewal lead qualify ಮಾಡುತ್ತದೆ.',
+        outcome: 'ELIGIBLE · ADVISOR CALLBACK',
+        context: 'SMB finance Kannada',
+      },
+      Tamil: {
+        customer: 'என் business loan இந்த மாதம் renew ஆகுமா?',
+        agent: 'ஆம் Priya, eligibility check செய்து amount preference confirm பண்ணி advisor callback schedule செய்கிறேன்.',
+        prompt: '“வணக்கம் Priya, உங்கள் loan renewal window open உள்ளது. eligibility, amount range மற்றும் callback timingஐ confirm செய்யலாம்.”',
+        voiceLine: 'Tamil-English mixல் renewal leadஐ qualify செய்கிறது.',
+        outcome: 'ELIGIBLE · ADVISOR CALLBACK',
+        context: 'SMB finance Tamil',
+      },
+      Telugu: {
+        customer: 'నా business loan ఈ నెల renew అవుతుందా?',
+        agent: 'అవును Priya garu, eligibility check చేసి amount preference confirm చేసి advisor callback schedule చేస్తాను.',
+        prompt: '“నమస్కారం Priya garu, మీ loan renewal window open ఉంది. eligibility, amount range మరియు callback timing confirm చేయగలను.”',
+        voiceLine: 'Telugu-English mixలో renewal lead qualify చేస్తుంది.',
+        outcome: 'ELIGIBLE · ADVISOR CALLBACK',
+        context: 'SMB finance Telugu',
+      },
+    } satisfies Record<LanguageMode, VoiceScript>,
   },
   {
     name: 'Meera',
@@ -93,6 +162,56 @@ const voiceAgents = [
     tone: 'Gentle · English',
     location: 'Mumbai',
     outcome: 'Booked · nurse alerted',
+    scripts: {
+      English: {
+        customer: 'Can I get a doctor appointment tomorrow morning?',
+        agent: 'Yes. I can book the 10:30 AM slot, send the address, and alert the nurse desk.',
+        prompt: '“Hello Ananya, I can help you confirm tomorrow’s clinic appointment and share the preparation instructions.”',
+        voiceLine: 'speaks gentle English for a clinic appointment flow.',
+        outcome: 'BOOKED · NURSE DESK ALERTED',
+        context: 'Clinic appointment desk',
+      },
+      Hindi: {
+        customer: 'क्या कल सुबह doctor appointment मिल सकती है?',
+        agent: 'हाँ Ananya ji, 10:30 AM का slot book कर देती हूँ, address भेज देती हूँ और nurse desk को alert कर देती हूँ।',
+        prompt: '“नमस्ते Ananya ji, मैं कल की clinic appointment confirm करके preparation instructions भेज सकती हूँ।”',
+        voiceLine: 'Hindi में clinic appointment gently confirm करती है।',
+        outcome: 'BOOKED · NURSE DESK ALERTED',
+        context: 'Clinic Hindi appointment',
+      },
+      Hinglish: {
+        customer: 'Kal morning doctor appointment mil sakti hai?',
+        agent: 'Haan Ananya ji, 10:30 AM ka slot book kar deti hoon, address bhej deti hoon aur nurse desk ko alert kar deti hoon.',
+        prompt: '“Namaste Ananya ji, main kal ki clinic appointment confirm karke preparation instructions bhej sakti hoon.”',
+        voiceLine: 'gentle Hinglish mein clinic appointment confirm karti hai.',
+        outcome: 'BOOKED · NURSE DESK ALERTED',
+        context: 'Clinic Hinglish front desk',
+      },
+      Kannada: {
+        customer: 'ನಾಳೆ ಬೆಳಿಗ್ಗೆ doctor appointment ಸಿಗುತ್ತದೆಯಾ?',
+        agent: 'ಹೌದು Ananya avare, 10:30 AM slot book ಮಾಡಿ address ಕಳುಹಿಸುತ್ತೇನೆ ಮತ್ತು nurse deskಗೆ alert ಮಾಡುತ್ತೇನೆ.',
+        prompt: '“ನಮಸ್ಕಾರ Ananya avare, ನಾಳೆಯ clinic appointment confirm ಮಾಡಿ preparation instructions ಕಳುಹಿಸಬಹುದು.”',
+        voiceLine: 'Kannada-English mix ನಲ್ಲಿ clinic appointment confirm ಮಾಡುತ್ತದೆ.',
+        outcome: 'BOOKED · NURSE DESK ALERTED',
+        context: 'Clinic Kannada front desk',
+      },
+      Tamil: {
+        customer: 'நாளை காலை doctor appointment கிடைக்குமா?',
+        agent: 'ஆம் Ananya, 10:30 AM slotஐ book செய்து address அனுப்பி nurse deskக்கு alert செய்கிறேன்.',
+        prompt: '“வணக்கம் Ananya, நாளைய clinic appointmentஐ confirm செய்து preparation instructions அனுப்பலாம்.”',
+        voiceLine: 'Tamil-English mixல் clinic appointmentஐ confirm செய்கிறது.',
+        outcome: 'BOOKED · NURSE DESK ALERTED',
+        context: 'Clinic Tamil front desk',
+      },
+      Telugu: {
+        customer: 'రేపు ఉదయం doctor appointment దొరుకుతుందా?',
+        agent: 'అవును Ananya garu, 10:30 AM slot book చేసి address పంపించి nurse deskకి alert చేస్తాను.',
+        prompt: '“నమస్కారం Ananya garu, రేపటి clinic appointment confirm చేసి preparation instructions పంపగలను.”',
+        voiceLine: 'Telugu-English mixలో clinic appointment confirm చేస్తుంది.',
+        outcome: 'BOOKED · NURSE DESK ALERTED',
+        context: 'Clinic Telugu front desk',
+      },
+    } satisfies Record<LanguageMode, VoiceScript>,
   },
 ]
 
@@ -271,7 +390,7 @@ function App() {
   const progress = useSpring(scrollYProgress, { stiffness: 90, damping: 24 })
 
   const agent = voiceAgents[activeAgent]
-  const localized = localizedLines[activeLanguage]
+  const localized = agent.scripts[activeLanguage]
   const operator = operatorScenarios[activeOperator]
   const playbook = playbooks[activePlaybook]
   const savings = useMemo(() => {
@@ -315,24 +434,37 @@ function App() {
         <motion.div className="hero-console" initial={{ opacity: 0, y: 36, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ delay: 0.18, duration: 0.8 }}>
           <div className="console-top"><span /> <span /> <span /> <b>live-call/orchestrator</b></div>
           <div className="call-orbit">
-            <div className="caller-card incoming">
-              <small>INCOMING</small>
-              <b>Rohan · Nexon EV enquiry</b>
-              <p>“Can I come this Saturday?”</p>
+            <div className="call-flow-grid">
+              <div className="caller-card incoming">
+                <small>INCOMING LEAD</small>
+                <b>Rohan · Nexon EV enquiry</b>
+                <p>“Saturday ko test drive mil sakti hai?”</p>
+              </div>
+              <div className="agent-core">
+                <PhoneCall size={34} />
+                <strong>Asha</strong>
+                <span>Hinglish · policy safe</span>
+              </div>
+              <div className="caller-card outcome">
+                <small>BOOKED OUTCOME</small>
+                <b>Slot booked · Sat 4:30</b>
+                <p>Showroom owner gets CRM note, recording, transcript, and manager alert.</p>
+              </div>
             </div>
-            <div className="agent-core">
-              <PhoneCall size={34} />
-              <strong>Asha</strong>
-              <span>Hinglish · policy safe</span>
+            <div className="hero-route" aria-label="Live call route">
+              <span><b>01</b> Lead caught in 8s</span>
+              <span><b>02</b> Consent confirmed</span>
+              <span><b>03</b> Hinglish response sent</span>
+              <span><b>04</b> CRM synced</span>
             </div>
-            <div className="caller-card outcome">
-              <small>OUTCOME</small>
-              <b>Slot booked · Sat 4:30</b>
-              <p>CRM note, recording, and manager alert synced.</p>
+            <div className="hero-translation-card">
+              <small>LOCAL SCRIPT</small>
+              <p>“Haan Rohan ji, nearest showroom ka slot confirm kar deti hoon.”</p>
             </div>
-          </div>
-          <div className="hero-ledger">
-            {['lead caught in 8s', 'consent confirmed', 'local language', 'CRM synced'].map((item) => <span key={item}><CircleDot size={12} /> {item}</span>)}
+            <div className="hero-proof-card">
+              <small>MANAGER HANDOFF</small>
+              <p>Model: Nexon EV · Area: Indiranagar · Intent: Hot</p>
+            </div>
           </div>
         </motion.div>
       </section>
@@ -373,13 +505,14 @@ function App() {
             ))}
           </aside>
           <div className="studio-panel">
-            <div className="studio-status"><span><Headphones size={15} /> Realtime preview</span><span>480ms turn</span><span>Guardrails on</span></div>
+            <div className="studio-status"><span><Headphones size={15} /> Real-time preview</span><span>480 ms response</span><span>{localized.context}</span></div>
             <div className="language-strip" aria-label="Language modes">
               {languages.map((language) => <button key={language} className={language === activeLanguage ? 'active' : ''} onClick={() => setActiveLanguage(language)} aria-pressed={language === activeLanguage}>{languageLabels[language]}</button>)}
             </div>
             <div className="voice-copy">
               <p className="mini-label">NOW SPEAKING</p>
               <h3>{agent.name} {localized.voiceLine}</h3>
+              <span className="language-note">Only this demo card changes language. The rest of the website stays in English.</span>
             </div>
             <div className="transcript-grid">
               <div>
@@ -387,9 +520,9 @@ function App() {
                 <WaveBars />
               </div>
               <div className="transcript-card">
-                <p><b>Customer</b> “{localized.customer}”</p>
-                <p><b>{agent.name}</b> “{localized.agent}”</p>
-                <span>{agent.outcome}</span>
+                <p><b>Customer:</b> “{localized.customer}”</p>
+                <p><b>{agent.name}:</b> “{localized.agent}”</p>
+                <span>{localized.outcome}</span>
               </div>
             </div>
             <div className="prompt-card"><Languages size={18} /><p>{localized.prompt}</p></div>
