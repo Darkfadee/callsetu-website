@@ -478,27 +478,27 @@ function App() {
           <a href="#use-cases">Use cases</a>
           <a href="#safety">Safety</a>
         </div>
-        <a className="nav-cta" href="mailto:hello@callsetu.ai?subject=Book%20a%20CallSetu%20test%20call">
-          Book test call <ArrowUpRight size={16} />
+        <a className="nav-cta" href="mailto:hello@callsetu.ai?subject=Book%20a%20CallSetu%20demo">
+          Book demo <ArrowUpRight size={16} />
         </a>
       </nav>
 
       <section id="top" className="hero" ref={heroRef}>
         <motion.div className="hero-copy" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-          <p className="eyebrow"><Sparkles size={14} /> Cinematic voice AI command center</p>
+          <p className="eyebrow"><Sparkles size={14} /> Voice AI for India's phone-heavy teams</p>
           <h1>
-            Every call becomes <span>a moving story.</span>
+            AI phone agents for <span>every customer call.</span>
           </h1>
-          <p className="hero-value">AI voice agents that answer, qualify, book, and sync every customer call.</p>
-          <p className="hero-text">CallSetu turns lead lists into warm, multilingual conversations — then shows the journey from first ring to booked outcome with live transcripts, policy rails, CRM syncs, and human handoffs.</p>
+          <p className="hero-value">Answer missed enquiries, qualify leads, book appointments, and update your CRM before the lead goes cold.</p>
+          <p className="hero-text">CallSetu configures warm, multilingual calling agents around your exact business playbook: test drives, renewals, appointment desks, follow-ups, collections, hiring screens, and human handoff rules.</p>
           <div className="hero-actions">
-            <a className="button primary magnet" href="mailto:hello@callsetu.ai?subject=Take%20a%20CallSetu%20test%20call"><PhoneCall size={18} /> Try a live AI call</a>
-            <a className="button glass magnet" href="#story"><Play size={18} /> Watch the flow</a>
+            <a className="button primary magnet" href="mailto:hello@callsetu.ai?subject=Book%20a%20CallSetu%20demo"><PhoneCall size={18} /> Book a CallSetu demo</a>
+            <a className="button glass magnet" href="#story"><Play size={18} /> See the call flow</a>
           </div>
           <div className="hero-proof" aria-label="Campaign proof">
-            <span><CircleDot size={13} /> Hindi + Hinglish + regional language modes</span>
-            <span><CircleDot size={13} /> First test calls after one playbook setup</span>
-            <span><CircleDot size={13} /> Human handoff when the AI should stop</span>
+            <span><CircleDot size={13} /> Hindi, Hinglish, Kannada and regional voice modes</span>
+            <span><CircleDot size={13} /> Pilot from one sheet, CRM, or campaign queue</span>
+            <span><CircleDot size={13} /> Human handoff, consent windows, and audit trail included</span>
           </div>
         </motion.div>
 
@@ -556,8 +556,8 @@ function App() {
       <section id="voice-lab" className="section voice-lab">
         <div className="section-heading center">
           <p className="eyebrow"><Mic2 size={14} /> Interactive voice lab</p>
-          <h2>Tap a voice. Watch this preview translate.</h2>
-          <p>Language buttons now affect only the live voice preview below — not the full marketing page.</p>
+          <h2>Hear one playbook adapt across Indian languages.</h2>
+          <p>Switch the preview from English to Hindi, Hinglish, Kannada, Tamil, or Telugu and see how the same business rule stays safe while the voice feels local.</p>
         </div>
         <div className="lab-shell">
           <aside className="voice-list">
@@ -593,7 +593,7 @@ function App() {
             </div>
             <div className="voice-demo-grid">
               <div>
-                <button className="play-voice"><Play size={18} /> Play {active.title} voice</button>
+                <a className="play-voice" href={`mailto:hello@callsetu.ai?subject=Send%20me%20a%20${active.title}%20voice%20sample`}><Play size={18} /> Request {active.title} sample</a>
                 <WaveBars />
               </div>
               <div className="mini-transcript">
@@ -615,8 +615,8 @@ function App() {
       <section id="product" className="section product-section">
         <div className="section-heading">
           <p className="eyebrow"><Workflow size={14} /> Product cockpit</p>
-          <h2>From lead list to live calls in under an hour.</h2>
-          <p>The cockpit is part dashboard, part animated evidence: queue, transcript, policy, outcome, and action rails in one cinematic surface.</p>
+          <h2>Control every campaign without losing human judgment.</h2>
+          <p>The cockpit keeps dense operations below the fold: queue, transcript, policy, outcome, confidence, escalation, and CRM sync in one supervised surface.</p>
         </div>
         <div className="cockpit">
           <motion.div className={`cockpit-main is-${operator.state}`} whileInView={{ rotateX: [4, 0], y: [30, 0], opacity: [0.82, 1] }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: 0.75 }}>
@@ -697,7 +697,7 @@ function App() {
                 {index === 0 ? 'Budget → model → showroom → booked slot' : index === 1 ? 'Location → budget → project FAQ → site visit' : index === 2 ? 'Confirm → remind → no-show risk → staff handoff' : 'Screen → language fit → availability → shortlist'}
               </div>
               <strong>{stat}</strong>
-              <button>View call flow</button>
+              <a href={`mailto:hello@callsetu.ai?subject=Show%20me%20the%20${encodeURIComponent(title)}%20CallSetu%20flow`}>View call flow</a>
             </motion.article>
           ))}
           <motion.article className="usecase-card custom" whileHover={{ y: -8 }}>
@@ -705,7 +705,7 @@ function App() {
             <h3>Education, insurance, logistics, debt collection, local services — any repeatable call script can become an agent.</h3>
             <div className="playbook-line">Script → guardrails → test calls → launch</div>
             <strong>Built around your workflow</strong>
-            <button>Design mine</button>
+            <a href="mailto:hello@callsetu.ai?subject=Design%20my%20CallSetu%20calling%20playbook">Design mine</a>
           </motion.article>
         </div>
       </section>
